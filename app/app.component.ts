@@ -1,25 +1,6 @@
-import { Hero } from './app.component';
-import { Component, NgModule, Injectable } from '@angular/core';
-import { AppModule } from "./app.module";
-
-export class Hero {
-  id: number;
-  name: string;
-} 
-
-const HEROES: Hero[] = [
-  { id: 11, name: 'Mr. Nice' },
-  { id: 12, name: 'Narco' },
-  { id: 13, name: 'Bombasto' },
-  { id: 14, name: 'Celeritas' },
-  { id: 15, name: 'Magneta' },
-  { id: 16, name: 'RubberMan' },
-  { id: 17, name: 'Dynama' },
-  { id: 18, name: 'Dr IQ' },
-  { id: 19, name: 'Magma' },
-  { id: 20, name: 'Tornado' }
-];
-
+import { Component, OnInit } from '@angular/core';
+import { Hero } from './hero';
+import { HeroService } from './hero.service';
 
 @Component({
   selector: 'my-app',
@@ -28,25 +9,18 @@ const HEROES: Hero[] = [
 
       <h2>My Heroes</h2>
       <ul class="heroes">
-        <li *ngFor="let hero of heroes"
-          (click)="onSelect(hero)"
-        >
-            <span class="badge">{{hero.id}}</span> {{hero.name}}
+        <li *ngFor = "let hero of heroes" 
+          [class.selected]="hero === selectedHero"
+          (click)="onSelect(hero)">
+           <span class="badge">{{hero.id}}</span> {{hero.name}}
         </li>
-      </ul>
+      </ul>    
 
-      <div *ngIf="selectedHero">
-        <h2>{{selectedHero.name}} details!</h2>
-        <div><label>id: </label>{{selectedHero.id}}</div>
-        <div>
-          <label>name: </label>
-          <input [(ngModel)]="selectedHero.name" placeholder="name">
-        </div>
-      <div>
-  `,
-      styles: [`
+      <my-hero-detail [hero]="selectedHero"></my-hero-detail>
+    `,
+    styles: [`
       .selected {
-        background-color: #CFD8DC !important;
+        background-color:grey !important;
         color: white;
       }
       .heroes {
@@ -92,24 +66,24 @@ const HEROES: Hero[] = [
         margin-right: .8em;
         border-radius: 4px 0 0 4px;
       }
-    `]
-    
+    `],
+    providers: [HeroService] 
 })
+export class AppComponent  implements OnInit { 
+  title = 'Tour of Heroes';
+  heroes: Hero []; 
+  selectedHero: Hero;
 
-@Injectable()
-export class AppComponent  {   
-  title = 'Tour of Heroes'; 
-  heroes = HEROES;
-  selectedHero: Hero;  
+  constructor(private heroService: HeroService){
 
-  onSelect(hero: Hero) : void{
-    this.selectedHero = hero;
-  }  
+  }
 
-  hero: Hero = {
-    id: 1,
-    name: 'Testing'
-  };  
+  onSelect(hero: Hero): void {
+    this.selectedHero = hero;    
+  }
+
+  ngOnInit(): void {
+     this.heroService.getHeroes().then(h => this.heroes = h);
+  }
 }
-
 
